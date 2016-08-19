@@ -1,0 +1,197 @@
+﻿/*
+    Author: André Luiz Rabêllo
+
+    Box with hover effects and adaptable icon size
+*/
+
+@master: ~'.hover-box';
+@icon: ~'@{master}-icon';
+@content: ~'@{master}-content';
+@mainText: ~'@{master}-main';
+@smallText: ~'@{master}-small';
+@action: ~'@{master}-action';
+@actionContent: ~'@{action}-content';
+
+// Master element
+@{master} {
+    @iconWidth: 25%;
+    @marginBottom: 15px;
+    @clickableHeight: 10px;
+
+    background: #fff;
+    color: #444;
+    border-radius: 2px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
+    display: flex;
+    margin-bottom: @marginBottom;
+    overflow: hidden;
+    position: relative;
+
+    // Shadow (darken background)
+    &:before {
+        content: "";
+        background: rgba(0, 0, 0, 0.1);
+        bottom: 0;
+        top: 0;
+        left: 0;
+        position: absolute;
+        transition: width 0.5s ease 0s;
+        width: @iconWidth;
+    }
+
+    &:hover:before {
+        width: 100%;
+    }
+    // Clickable variant
+    &.clickable {
+        cursor: pointer;
+        border-radius: 5px;
+        box-shadow: 0 -@clickableHeight 0 rgba(0, 0, 0, 0.2) inset;
+        padding-bottom: @clickableHeight;
+        top: 0;
+        
+        -webkit-user-select: none;
+           -moz-user-select: none;
+            -ms-user-select: none;
+                user-select: none;
+    }
+
+    &.clickable:active {
+        box-shadow: 0 -@clickableHeight/2 0 rgba(0, 0, 0, 0.2) inset;
+        padding-bottom: @clickableHeight/2;
+        margin-bottom: @clickableHeight/2 + @marginBottom;
+        top: @clickableHeight/2;
+    }
+    // Disabled state
+    &.disabled:after,
+    &[disabled]:after {
+        background: #9e9e9e;
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        box-shadow: none;
+        padding-bottom: 0;
+    }
+    // Content
+    div {
+        @padding: 8px;
+
+        border: none;
+        margin: 0;
+        z-index: 1;
+
+        // Icon - title
+        &@{icon} {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: @iconWidth;
+            font-size: 45px;
+        }
+        // Content - body
+        &@{content} {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding: 20px 10px;
+            width: 100%;
+
+            // Main text
+            @{mainText} {
+                font-size: 22px;
+                font-weight: 400;
+                line-height: 1.25;
+            }
+            // Small text
+            @{smallText} {
+                font-size: 12px;
+                font-weight: 300;
+                line-height: 1;
+            }
+        }
+        // Action Content - without trigger
+        &@{actionContent} {
+            display: inline-block;
+            padding: @padding;
+        }
+        // Action - with trigger and content
+        &@{action} {
+            @triggerSize: 25px;
+
+            padding: @padding;
+            position: absolute;
+            right: 0;
+            top: 0;
+
+            // Trigger text - "..."
+            &:before {
+                content: ".";
+                font-size: 32px;
+                line-height: 0.5;
+                pointer-events: none;
+                position: absolute;
+                right: @padding * 2 + 2px;
+                top: 0;
+                text-shadow: 6px 0 0px, -6px 0 0;
+                z-index: 1;
+            }
+            // Container for actions
+            @{actionContent} {
+                padding: 0;
+                position: relative;
+                right: -100%;
+                top: 0;
+                opacity: 0;
+                visibility: hidden;
+                transform: scale(0.5);
+                transition: all 0.5s;
+            }
+            // Trigger :focus
+            input[readonly] {
+                background: transparent;
+                border: 0;
+                border-radius: 50%;
+                color: transparent;
+                cursor: pointer;
+                position: absolute;
+                top: @padding - 3px;
+                right: @padding + 2px;
+                height: @triggerSize;
+                width: @triggerSize;
+                transition: all 0.3s;
+
+                // Hover
+                &:hover {
+                    background: rgba(0, 0, 0, 0.2);
+                }
+                // Show action content
+                &:focus ~ @{actionContent} {
+                    opacity: 1;
+                    right: 0;
+                    visibility: visible;
+                    transform: scale(1);
+                }
+            }
+        }
+    }
+    // Different sizes
+    @i: 20;
+
+    .loop (@i) when (@i =< 50) {
+        &.s@{i} {
+            &:before {
+                min-width: @i * 1%;
+            }
+
+            .hover-box-icon {
+                min-width: @i * 1%;
+            }
+        }
+
+        .loop(@i + 5);
+    }
+
+    .loop(@i);
+}
